@@ -16,6 +16,7 @@ export default defineConfig({
         ]
       : []),
   ],
+  base: '/RetroGameHub/',
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
@@ -27,5 +28,10 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    sourcemap: true,
+  },
+  server: {
+    port: 3000,
+    open: true,
   },
 });
