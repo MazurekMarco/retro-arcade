@@ -73,9 +73,9 @@ const TETROMINOES = [
 ];
 
 // Create empty grid
-const createEmptyGrid = () => {
-  return Array.from({ length: GRID_HEIGHT }, () => 
-    Array.from({ length: GRID_WIDTH }, () => null)
+const createEmptyGrid = (rows: number = GRID_HEIGHT, cols: number = GRID_WIDTH) => {
+  return Array.from({ length: rows }, () => 
+    Array.from({ length: cols }, () => null)
   );
 };
 
@@ -114,8 +114,8 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
   const [speed, setSpeed] = useState(INITIAL_SPEED);
   const [gameStarted, setGameStarted] = useState(false);
   const [nextTetromino, setNextTetromino] = useState<Tetromino | null>(null);
-  const [nextTetrominoDisplay, setNextTetrominoDisplay] = useState<Cell[][]>(createEmptyGrid(4, 4));
-  const [ghostPosition, setGhostPosition] = useState<Cell[][]>(createEmptyGrid(GRID_HEIGHT, GRID_WIDTH));
+  const [nextTetrominoDisplay] = useState<Cell[][]>(createEmptyGrid(4, 4));
+  const [ghostPosition] = useState<Cell[][]>(createEmptyGrid());
   
   // Refs for game loop
   const gameLoopRef = useRef<NodeJS.Timeout | null>(null);

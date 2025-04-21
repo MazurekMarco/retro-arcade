@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useHighScores } from "@/lib/useHighScores";
 import { useSound } from "@/lib/useSound";
 import { CrtEffect } from "@/components/ui/CrtEffect";
-import { GameOver } from "@/components/GameOver";
 
 // Game constants
 const CANVAS_WIDTH = 640;
