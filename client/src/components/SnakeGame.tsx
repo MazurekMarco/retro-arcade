@@ -35,6 +35,7 @@ export function SnakeGame({ onExit }: SnakeGameProps) {
   const [score, setScore] = useState<number>(0);
   const [level, setLevel] = useState<number>(1);
   const [speed, setSpeed] = useState<number>(INITIAL_SPEED);
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
   
   const { getHighScore, setHighScore } = useHighScores();
   const { playSound } = useSound();
@@ -42,11 +43,16 @@ export function SnakeGame({ onExit }: SnakeGameProps) {
   const highScore = getHighScore("snake") || 0;
   const gameLoopRef = useRef<number | null>(null);
   const directionRef = useRef(direction);
+  const foodRef = useRef(food);
   
-  // Update direction ref when direction changes
+  // Update refs when their values change
   useEffect(() => {
     directionRef.current = direction;
   }, [direction]);
+  
+  useEffect(() => {
+    foodRef.current = food;
+  }, [food]);
 
   // Generate random food position
   const generateFood = useCallback((): Position => {
@@ -118,9 +124,29 @@ export function SnakeGame({ onExit }: SnakeGameProps) {
     };
   }, [handleKeyDown]);
 
+  // Handle game start
+  const startGame = useCallback(() => {
+    setGameStarted(true);
+    playSound('select');
+  }, [playSound]);
+  
+  // Key event specifically for starting the game
+  useEffect(() => {
+    const handleStartKey = (e: KeyboardEvent) => {
+      if (!gameStarted && (e.code === "Space" || e.code === "Enter")) {
+        startGame();
+      }
+    };
+    
+    window.addEventListener("keydown", handleStartKey);
+    return () => {
+      window.removeEventListener("keydown", handleStartKey);
+    };
+  }, [gameStarted, startGame]);
+  
   // Game loop
   useEffect(() => {
-    if (paused || gameOver) {
+    if (paused || gameOver || !gameStarted) {
       if (gameLoopRef.current) {
         cancelAnimationFrame(gameLoopRef.current);
         gameLoopRef.current = null;
@@ -152,7 +178,7 @@ export function SnakeGame({ onExit }: SnakeGameProps) {
         gameLoopRef.current = null;
       }
     };
-  }, [paused, gameOver, speed]);
+  }, [paused, gameOver, gameStarted, speed]);
 
   // Move snake
   const moveSnake = () => {
@@ -195,9 +221,13 @@ export function SnakeGame({ onExit }: SnakeGameProps) {
       }
       
       // Check for food collision
-      if (head.x === food.x && head.y === food.y) {
+      if (head.x === foodRef.current.x && head.y === foodRef.current.y) {
         playSound('eat');
-        setFood(generateFood());
+        
+        // Generate new food outside of the state update
+        const newFood = generateFood();
+        setTimeout(() => setFood(newFood), 0);
+        
         setScore(prevScore => {
           const newScore = prevScore + 10;
           
@@ -239,13 +269,20 @@ export function SnakeGame({ onExit }: SnakeGameProps) {
       { x: 7, y: 10 },
       { x: 6, y: 10 },
     ]);
-    setFood(generateFood());
+    
+    // Generate new food
+    const newFood = generateFood();
+    setFood(newFood);
+    foodRef.current = newFood;
+    
+    // Reset all game state
     setDirection("RIGHT");
     setGameOver(false);
     setPaused(false);
     setScore(0);
     setLevel(1);
     setSpeed(INITIAL_SPEED);
+    setGameStarted(true);
     playSound('select');
   };
 
@@ -322,6 +359,30 @@ export function SnakeGame({ onExit }: SnakeGameProps) {
         {paused && !gameOver && (
           <div className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center">
             <h3 className="text-yellow-400 text-2xl animate-blink">PAUSED</h3>
+          </div>
+        )}
+        
+        {/* Start Game Overlay */}
+        {!gameStarted && (
+          <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center z-20">
+            <div className="bg-black border-2 border-primary p-8 rounded-md w-11/12 max-w-md mb-8">
+              <h3 className="text-primary text-2xl text-center mb-6 font-arcade">SNAKE</h3>
+              <p className="text-gray-300 mb-4 text-center">Use arrow keys to move the snake.</p>
+              <p className="text-gray-300 mb-6 text-center">Collect food to grow and earn points, but don't hit the walls or yourself!</p>
+              <div className="flex justify-between items-center border-t border-gray-800 pt-4">
+                <div>
+                  <p className="text-xs text-gray-400">CURRENT HIGH SCORE</p>
+                  <p className="text-yellow-400 font-score text-xl">{highScore}</p>
+                </div>
+                <button
+                  className="arcade-btn bg-arcade-dark px-6 py-3 border-2 border-primary text-primary animate-pulse"
+                  onClick={startGame}
+                >
+                  PRESS START
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500">PRESS SPACE OR ENTER TO START</p>
           </div>
         )}
       </div>

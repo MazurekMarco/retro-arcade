@@ -63,7 +63,7 @@ export function GameMenu({ onSelectGame }: GameMenuProps) {
       <div className="flex flex-col justify-center min-h-[80vh] px-4 py-8">
         <div className="mb-8 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl text-accent mb-4 animate-glow">SELECT GAME</h2>
-          <p className="text-sm sm:text-base text-yellow-400 mb-8">INSERT COIN TO PLAY</p>
+          <p className="text-sm sm:text-base text-yellow-400 mb-8">CHOOSE A GAME TO PLAY</p>
         </div>
         
         {/* Game Grid */}
