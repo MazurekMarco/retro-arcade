@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { useHighScores } from "@/lib/useHighScores";
 import { useSound } from "@/lib/useSound";
+import { BackgroundMusic } from "@/components/BackgroundMusic";
 
 interface LayoutProps {
   children: ReactNode;
@@ -18,6 +19,9 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col justify-between font-arcade text-white bg-arcade-cabinet relative p-2 sm:p-6 overflow-hidden">
+      {/* Background Music */}
+      <BackgroundMusic />
+      
       {/* Cabinet Lights */}
       <div className="hidden md:block absolute top-0 left-0 w-2 h-full bg-primary opacity-70 cabinet-light"></div>
       <div className="hidden md:block absolute top-0 right-0 w-2 h-full bg-primary opacity-70 cabinet-light"></div>
