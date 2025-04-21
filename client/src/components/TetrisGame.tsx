@@ -91,9 +91,15 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
   // Sound effects
   const { playSound } = useSound();
   
+  // Define tetromino type
+  type Tetromino = {
+    shape: number[][];
+    color: string;
+  };
+
   // Game state
   const [grid, setGrid] = useState(createEmptyGrid());
-  const [activeTetromino, setActiveTetromino] = useState(null);
+  const [activeTetromino, setActiveTetromino] = useState<Tetromino | null>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [gameOver, setGameOver] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -102,12 +108,12 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
   const [lines, setLines] = useState(0);
   const [speed, setSpeed] = useState(INITIAL_SPEED);
   const [gameStarted, setGameStarted] = useState(false);
-  const [nextTetromino, setNextTetromino] = useState(null);
+  const [nextTetromino, setNextTetromino] = useState<Tetromino | null>(null);
   
   // Refs for game loop
-  const gameLoopRef = useRef(null);
+  const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
   const gridRef = useRef(grid);
-  const activeTetrominoRef = useRef(activeTetromino);
+  const activeTetrominoRef = useRef<Tetromino | null>(activeTetromino);
   const positionRef = useRef(position);
   const pausedRef = useRef(paused);
   const gameOverRef = useRef(gameOver);
@@ -153,7 +159,7 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
   }, [nextTetromino, generateRandomTetromino, score, highScore, setHighScore, playSound]);
   
   // Check if a position is valid for the active tetromino
-  const isValidPosition = useCallback((tetromino, pos) => {
+  const isValidPosition = useCallback((tetromino: Tetromino | null, pos: { x: number, y: number }) => {
     if (!tetromino) return false;
     
     // Check each block of the tetromino
@@ -210,7 +216,7 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
   }, [isValidPosition, playSound]);
   
   // Move the active tetromino
-  const moveTetromino = useCallback((dx, dy) => {
+  const moveTetromino = useCallback((dx: number, dy: number) => {
     const newPos = { x: positionRef.current.x + dx, y: positionRef.current.y + dy };
     
     if (activeTetrominoRef.current && isValidPosition(activeTetrominoRef.current, newPos)) {

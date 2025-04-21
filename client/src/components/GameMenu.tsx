@@ -34,14 +34,10 @@ export function GameMenu({ onSelectGame }: GameMenuProps) {
       borderColor: "border-primary",
       textColor: "text-primary",
     },
-  ];
-  
-  // Coming soon games (placeholders)
-  const comingSoonGames: Game[] = [
     {
       id: "tetris",
       name: "TETRIS",
-      highScore: 0,
+      highScore: getHighScore("tetris") || 0,
       difficulty: "HARD",
       color: "blue-500",
       borderColor: "border-blue-500",
@@ -50,12 +46,16 @@ export function GameMenu({ onSelectGame }: GameMenuProps) {
     {
       id: "pong",
       name: "PONG",
-      highScore: 0,
+      highScore: getHighScore("pong") || 0,
       difficulty: "EASY",
       color: "accent",
       borderColor: "border-accent",
       textColor: "text-accent",
     },
+  ];
+  
+  // Coming soon games (placeholders)
+  const comingSoonGames: Game[] = [
     {
       id: "pacman",
       name: "PACMAN",

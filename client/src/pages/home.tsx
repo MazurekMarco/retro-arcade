@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { GameMenu } from "@/components/GameMenu";
 import { SnakeGame } from "@/components/SnakeGame";
+import { TetrisGame } from "@/components/TetrisGame";
+import { PongGame } from "@/components/PongGame";
 import { useSound } from "@/lib/useSound";
 
 export default function Home() {
@@ -27,27 +29,11 @@ export default function Home() {
       )}
       
       {currentGame === "tetris" && (
-        <div className="text-center text-white py-8">
-          <h2 className="text-2xl mb-4">Tetris Coming Soon!</h2>
-          <button 
-            onClick={handleExitGame}
-            className="arcade-btn bg-arcade-dark px-6 py-2 border-2 border-primary text-primary"
-          >
-            BACK TO MENU
-          </button>
-        </div>
+        <TetrisGame onExit={handleExitGame} />
       )}
       
       {currentGame === "pong" && (
-        <div className="text-center text-white py-8">
-          <h2 className="text-2xl mb-4">Pong Coming Soon!</h2>
-          <button 
-            onClick={handleExitGame}
-            className="arcade-btn bg-arcade-dark px-6 py-2 border-2 border-primary text-primary"
-          >
-            BACK TO MENU
-          </button>
-        </div>
+        <PongGame onExit={handleExitGame} />
       )}
     </>
   );
