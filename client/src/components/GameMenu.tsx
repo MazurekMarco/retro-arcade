@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useHighScores } from "@/lib/useHighScores";
 import { useSound } from "@/lib/useSound";
 import { CrtEffect } from "@/components/ui/CrtEffect";

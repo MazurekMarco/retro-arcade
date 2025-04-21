@@ -83,6 +83,7 @@ const createEmptyGrid = (rows: number = GRID_HEIGHT, cols: number = GRID_WIDTH) 
 type Cell = string | null;
 type Grid = Cell[][];
 type KeyboardEvent = React.KeyboardEvent<HTMLDivElement>;
+type WindowKeyboardEvent = globalThis.KeyboardEvent;
 
 interface TetrisGameProps {
   onExit: () => void;
@@ -103,7 +104,7 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
   };
 
   // Game state
-  const [grid, setGrid] = useState(createEmptyGrid());
+  const [grid, setGrid] = useState<Grid>(createEmptyGrid());
   const [activeTetromino, setActiveTetromino] = useState<Tetromino | null>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [gameOver, setGameOver] = useState(false);
@@ -114,8 +115,6 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
   const [speed, setSpeed] = useState(INITIAL_SPEED);
   const [gameStarted, setGameStarted] = useState(false);
   const [nextTetromino, setNextTetromino] = useState<Tetromino | null>(null);
-  const [nextTetrominoDisplay] = useState<Cell[][]>(createEmptyGrid(4, 4));
-  const [ghostPosition] = useState<Cell[][]>(createEmptyGrid());
   
   // Refs for game loop
   const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
@@ -267,47 +266,15 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
     playSound('eat');
   }, [isValidPosition, playSound]);
   
-  // Lock the current tetromino onto the grid
-  const lockTetromino = useCallback(() => {
-    if (!activeTetrominoRef.current) return;
-    
-    // Create a new grid
-    const newGrid = gridRef.current.map(row => [...row]);
-    
-    // Add the tetromino to the grid
-    for (let y = 0; y < activeTetrominoRef.current.shape.length; y++) {
-      for (let x = 0; x < activeTetrominoRef.current.shape[y].length; x++) {
-        if (activeTetrominoRef.current.shape[y][x]) {
-          const newY = positionRef.current.y + y;
-          const newX = positionRef.current.x + x;
-          
-          // Only place blocks within the grid
-          if (newY >= 0 && newY < GRID_HEIGHT && newX >= 0 && newX < GRID_WIDTH) {
-            newGrid[newY][newX] = activeTetrominoRef.current.color;
-          }
-        }
-      }
-    }
-    
-    // Update the grid
-    setGrid(newGrid);
-    
-    // Check for completed lines
-    checkLines(newGrid);
-    
-    // Spawn a new tetromino
-    spawnTetromino();
-  }, [spawnTetromino]);
-  
   // Check for completed lines
-  const checkLines = useCallback((grid) => {
+  const checkLines = useCallback((grid: Grid) => {
     let completedLines = 0;
-    const newGrid = [...grid];
+    const newGrid: Grid = [...grid];
     
     // Check each row
     for (let y = 0; y < GRID_HEIGHT; y++) {
       // Check if the row is full
-      if (newGrid[y].every(cell => cell !== null)) {
+      if (newGrid[y].every((cell: Cell) => cell !== null)) {
         // Remove the row
         newGrid.splice(y, 1);
         // Add an empty row at the top
@@ -348,41 +315,75 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
     }
   }, [level, playSound]);
   
-  // Handle keydown events
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (gameOver || !gameStarted) return;
-
-    switch (e.key) {
-      case "ArrowLeft":
-        moveTetromino(-1, 0);
-        break;
-      case "ArrowRight":
-        moveTetromino(1, 0);
-        break;
-      case "ArrowDown":
-        moveDown();
-        break;
-      case "ArrowUp":
-        rotateTetromino();
-        break;
-      case " ":
-        if (!gameStarted) {
-          setGameStarted(true);
-          playSound('select');
-        } else {
-          setPaused(prev => !prev);
+  // Lock the current tetromino onto the grid
+  const lockTetromino = useCallback(() => {
+    if (!activeTetrominoRef.current) return;
+    
+    // Create a new grid
+    const newGrid: Grid = gridRef.current.map(row => [...row]);
+    
+    // Add the tetromino to the grid
+    for (let y = 0; y < activeTetrominoRef.current.shape.length; y++) {
+      for (let x = 0; x < activeTetrominoRef.current.shape[y].length; x++) {
+        if (activeTetrominoRef.current.shape[y][x]) {
+          const newY = positionRef.current.y + y;
+          const newX = positionRef.current.x + x;
+          
+          // Only place blocks within the grid
+          if (newY >= 0 && newY < GRID_HEIGHT && newX >= 0 && newX < GRID_WIDTH) {
+            newGrid[newY][newX] = activeTetrominoRef.current.color;
+          }
         }
-        break;
+      }
     }
-  };
+    
+    // Update the grid
+    setGrid(newGrid);
+    
+    // Check for completed lines
+    checkLines(newGrid);
+    
+    // Spawn a new tetromino
+    spawnTetromino();
+  }, [spawnTetromino, checkLines]);
   
   // Set up keyboard event listeners
   useEffect(() => {
+    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (gameOver || !gameStarted) return;
+
+      switch (e.key) {
+        case "ArrowLeft":
+          moveTetromino(-1, 0);
+          break;
+        case "ArrowRight":
+          moveTetromino(1, 0);
+          break;
+        case "ArrowDown":
+          moveDown();
+          break;
+        case "ArrowUp":
+          rotateTetromino();
+          break;
+        case " ":
+          if (!gameStarted) {
+            setGameStarted(true);
+            playSound('select');
+          } else {
+            setPaused(prev => !prev);
+          }
+          break;
+        case "Enter":
+          hardDrop();
+          break;
+      }
+    };
+
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleKeyDown]);
+  }, [gameOver, gameStarted, moveTetromino, moveDown, rotateTetromino, hardDrop, playSound]);
   
   // Game loop
   useEffect(() => {
