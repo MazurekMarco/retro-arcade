@@ -130,7 +130,7 @@ export function useSound() {
       
       // Add a gain node to control volume
       const gainNode = audioContext.createGain();
-      gainNode.gain.value = 0.5; // Set volume to 50%
+      gainNode.gain.value = 0.2; // Set volume to 20%
       
       // Connect nodes
       source.connect(gainNode);

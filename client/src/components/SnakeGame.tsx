@@ -56,27 +56,31 @@ export function SnakeGame({ onExit }: SnakeGameProps) {
 
   // Generate random food position
   const generateFood = useCallback((): Position => {
-    // Create a copy of the snake for comparison
+    // Create a copy of current snake state
     const snakeCopy = [...snake];
     
-    // Generate random coordinates
-    let x = Math.floor(Math.random() * (GRID_SIZE - 2)) + 1;
-    let y = Math.floor(Math.random() * (GRID_SIZE - 2)) + 1;
-    
-    // Make sure food doesn't appear on snake
-    // Using a while loop instead of recursion to avoid stack overflow
-    let attempts = 0;
-    while (
-      snakeCopy.some(segment => segment.x === x && segment.y === y) && 
-      attempts < 50
-    ) {
-      x = Math.floor(Math.random() * (GRID_SIZE - 2)) + 1;
-      y = Math.floor(Math.random() * (GRID_SIZE - 2)) + 1;
-      attempts++;
+    // Create an array of all valid positions on the grid
+    const validPositions: Position[] = [];
+    for (let x = 0; x < GRID_SIZE; x++) {
+      for (let y = 0; y < GRID_SIZE; y++) {
+        // Check if this position is occupied by the snake
+        if (!snakeCopy.some(segment => segment.x === x && segment.y === y)) {
+          validPositions.push({ x, y });
+        }
+      }
     }
     
-    console.log("Food generated at", x, y);
-    return { x, y };
+    // If there are no valid positions left, return a default position
+    if (validPositions.length === 0) {
+      return { x: 0, y: 0 };
+    }
+    
+    // Pick a random valid position
+    const randomIndex = Math.floor(Math.random() * validPositions.length);
+    const newFoodPosition = validPositions[randomIndex];
+    
+    console.log("Food generated at", newFoodPosition.x, newFoodPosition.y);
+    return newFoodPosition;
   }, [snake]);
 
   // Handle key presses

@@ -23,7 +23,8 @@ export function GameMenu({ onSelectGame }: GameMenuProps) {
   const { playSound } = useSound();
   const [isHighScoresVisible, setIsHighScoresVisible] = useState(false);
 
-  const games: Game[] = [
+  // Available games that can be played
+  const availableGames: Game[] = [
     {
       id: "snake",
       name: "SNAKE",
@@ -33,10 +34,14 @@ export function GameMenu({ onSelectGame }: GameMenuProps) {
       borderColor: "border-primary",
       textColor: "text-primary",
     },
+  ];
+  
+  // Coming soon games (placeholders)
+  const comingSoonGames: Game[] = [
     {
       id: "tetris",
       name: "TETRIS",
-      highScore: getHighScore("tetris") || 0,
+      highScore: 0,
       difficulty: "HARD",
       color: "blue-500",
       borderColor: "border-blue-500",
@@ -45,11 +50,38 @@ export function GameMenu({ onSelectGame }: GameMenuProps) {
     {
       id: "pong",
       name: "PONG",
-      highScore: getHighScore("pong") || 0,
+      highScore: 0,
       difficulty: "EASY",
       color: "accent",
       borderColor: "border-accent",
       textColor: "text-accent",
+    },
+    {
+      id: "pacman",
+      name: "PACMAN",
+      highScore: 0,
+      difficulty: "MEDIUM",
+      color: "yellow-400",
+      borderColor: "border-yellow-400",
+      textColor: "text-yellow-400",
+    },
+    {
+      id: "spacewar",
+      name: "SPACE WAR",
+      highScore: 0,
+      difficulty: "HARD",
+      color: "red-500",
+      borderColor: "border-red-500",
+      textColor: "text-red-500",
+    },
+    {
+      id: "frogger",
+      name: "FROGGER",
+      highScore: 0,
+      difficulty: "MEDIUM",
+      color: "green-400",
+      borderColor: "border-green-400",
+      textColor: "text-green-400",
     }
   ];
 
@@ -73,12 +105,13 @@ export function GameMenu({ onSelectGame }: GameMenuProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ staggerChildren: 0.15 }}
         >
-          {games.map((game) => (
+          {/* Available games */}
+          {availableGames.map((game) => (
             <motion.div
               key={game.id}
               className={`game-card bg-black border-2 ${game.borderColor} rounded-lg overflow-hidden pixel-corners cursor-pointer shadow-lg`}
               onClick={() => handleGameClick(game.id)}
-              whileHover={{ scale: 1.05, boxShadow: `0 0 25px hsl(var(--${game.color.split('-')[0]}))` }}
+              whileHover={{ scale: 1.05 }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -96,6 +129,32 @@ export function GameMenu({ onSelectGame }: GameMenuProps) {
                 <div className="flex justify-between items-center">
                   <span className={`text-sm ${game.textColor}`}>DIFFICULTY: {game.difficulty}</span>
                   <button className={`arcade-btn bg-arcade-dark px-4 py-2 text-sm ${game.borderColor} ${game.textColor} hover:bg-${game.color} hover:bg-opacity-20 transition-colors`}>PLAY</button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+          
+          {/* Coming soon games */}
+          {comingSoonGames.map((game) => (
+            <motion.div
+              key={game.id}
+              className={`game-card coming-soon bg-black border-2 border-gray-700 rounded-lg overflow-hidden pixel-corners shadow-lg`}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="aspect-video bg-gradient-to-b from-gray-900 to-black relative flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-70"></div>
+                </div>
+                <div className={`absolute top-0 left-0 w-full h-1 bg-${game.color} opacity-30`}></div>
+                <div className={`absolute bottom-0 left-0 w-full h-1 bg-${game.color} opacity-30`}></div>
+                <h3 className={`text-2xl ${game.textColor} z-10 font-bold opacity-80`}>{game.name}</h3>
+              </div>
+              <div className="p-4 bg-black">
+                <div className="text-sm text-gray-400 mb-3 opacity-80">DIFFICULTY: {game.difficulty}</div>
+                <div className="flex justify-center items-center">
+                  <span className="text-xs text-gray-500 animate-blink">MORE COMING SOON</span>
                 </div>
               </div>
             </motion.div>
