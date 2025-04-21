@@ -60,46 +60,53 @@ export function GameMenu({ onSelectGame }: GameMenuProps) {
 
   return (
     <CrtEffect>
-      <div className="mb-8 text-center">
-        <h2 className="text-xl sm:text-2xl md:text-3xl text-accent mb-2">SELECT GAME</h2>
-        <p className="text-xs sm:text-sm text-gray-400">INSERT COIN TO PLAY</p>
-      </div>
-      
-      {/* Game Grid */}
-      <motion.div 
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ staggerChildren: 0.1 }}
-      >
-        {games.map((game) => (
-          <motion.div
-            key={game.id}
-            className={`game-card bg-black border-2 ${game.borderColor} rounded-lg overflow-hidden pixel-corners cursor-pointer`}
-            onClick={() => handleGameClick(game.id)}
-            whileHover={{ scale: 1.03 }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <div className="aspect-video bg-black relative flex items-center justify-center">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black"></div>
+      <div className="flex flex-col justify-center min-h-[80vh] px-4 py-8">
+        <div className="mb-8 text-center">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl text-accent mb-4 animate-glow">SELECT GAME</h2>
+          <p className="text-sm sm:text-base text-yellow-400 mb-8">INSERT COIN TO PLAY</p>
+        </div>
+        
+        {/* Game Grid */}
+        <motion.div 
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ staggerChildren: 0.15 }}
+        >
+          {games.map((game) => (
+            <motion.div
+              key={game.id}
+              className={`game-card bg-black border-2 ${game.borderColor} rounded-lg overflow-hidden pixel-corners cursor-pointer shadow-lg`}
+              onClick={() => handleGameClick(game.id)}
+              whileHover={{ scale: 1.05, boxShadow: `0 0 25px hsl(var(--${game.color.split('-')[0]}))` }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="aspect-video bg-black relative flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-70"></div>
+                </div>
+                <div className={`absolute top-0 left-0 w-full h-1 bg-${game.color} opacity-70`}></div>
+                <div className={`absolute bottom-0 left-0 w-full h-1 bg-${game.color} opacity-70`}></div>
+                <h3 className={`text-2xl ${game.textColor} z-10 font-bold`}>{game.name}</h3>
               </div>
-              <h3 className={`text-xl ${game.textColor} z-10 font-bold`}>{game.name}</h3>
-            </div>
-            <div className="p-3 bg-black">
-              <div className="text-xs text-gray-400 mb-2">HIGH SCORE: <span className="text-yellow-400">{game.highScore}</span></div>
-              <div className="flex justify-between items-center">
-                <span className={`text-xs ${game.textColor}`}>DIFFICULTY: {game.difficulty}</span>
-                <button className={`arcade-btn bg-arcade-dark px-2 py-1 text-xs ${game.borderColor} ${game.textColor}`}>PLAY</button>
+              <div className="p-4 bg-black">
+                <div className="text-sm text-gray-400 mb-3">HIGH SCORE: <span className="text-yellow-400 font-score text-lg">{game.highScore}</span></div>
+                <div className="flex justify-between items-center">
+                  <span className={`text-sm ${game.textColor}`}>DIFFICULTY: {game.difficulty}</span>
+                  <button className={`arcade-btn bg-arcade-dark px-4 py-2 text-sm ${game.borderColor} ${game.textColor} hover:bg-${game.color} hover:bg-opacity-20 transition-colors`}>PLAY</button>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
-      
-      <div className="text-center text-xs animate-blink">
-        <p>PRESS SPACEBAR TO START - ARROWS TO NAVIGATE</p>
+            </motion.div>
+          ))}
+        </motion.div>
+        
+        <div className="text-center text-sm animate-blink mt-auto">
+          <p className="p-2 border border-gray-700 inline-block bg-black bg-opacity-70">
+            PRESS SPACEBAR TO START - ARROWS TO NAVIGATE
+          </p>
+        </div>
       </div>
     </CrtEffect>
   );
