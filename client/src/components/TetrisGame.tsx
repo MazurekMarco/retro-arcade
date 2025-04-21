@@ -13,8 +13,17 @@ const SPEED_DECREASE_FACTOR = 0.9;
 const LINES_PER_LEVEL = 5;
 const MAX_LEVEL = 10;
 
+// Add these type definitions at the top of the file
+type Cell = "cyan-500" | "blue-500" | "orange-500" | "yellow-400" | "green-500" | "purple-500" | "red-500" | null;
+type Grid = Cell[][];
+
+type Tetromino = {
+  shape: number[][];
+  color: Cell;
+};
+
 // Tetrominoes
-const TETROMINOES = [
+const TETROMINOES: Tetromino[] = [
   // I
   {
     shape: [
@@ -79,12 +88,6 @@ const createEmptyGrid = (rows: number = GRID_HEIGHT, cols: number = GRID_WIDTH) 
   );
 };
 
-// Add these type definitions at the top of the file
-type Cell = string | null;
-type Grid = Cell[][];
-type KeyboardEvent = React.KeyboardEvent<HTMLDivElement>;
-type WindowKeyboardEvent = globalThis.KeyboardEvent;
-
 interface TetrisGameProps {
   onExit: () => void;
 }
@@ -97,12 +100,6 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
   // Sound effects
   const { playSound } = useSound();
   
-  // Define tetromino type
-  type Tetromino = {
-    shape: number[][];
-    color: string;
-  };
-
   // Game state
   const [grid, setGrid] = useState<Grid>(createEmptyGrid());
   const [activeTetromino, setActiveTetromino] = useState<Tetromino | null>(null);
