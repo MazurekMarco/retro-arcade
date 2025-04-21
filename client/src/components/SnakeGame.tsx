@@ -14,8 +14,8 @@ interface SnakeGameProps {
 }
 
 // Game constants
-const GRID_SIZE = 20;
-const CELL_SIZE = 15;
+const GRID_SIZE = 30; // Increased grid size for better screen utilization
+const CELL_SIZE = 20; // Increased cell size for better visibility
 const INITIAL_SPEED = 150;
 const MAX_LEVEL = 10;
 const SPEED_DECREASE_PER_LEVEL = 10;
@@ -50,13 +50,26 @@ export function SnakeGame({ onExit }: SnakeGameProps) {
 
   // Generate random food position
   const generateFood = useCallback((): Position => {
-    const x = Math.floor(Math.random() * (GRID_SIZE - 1));
-    const y = Math.floor(Math.random() * (GRID_SIZE - 1));
+    // Create a copy of the snake for comparison
+    const snakeCopy = [...snake];
+    
+    // Generate random coordinates
+    let x = Math.floor(Math.random() * (GRID_SIZE - 2)) + 1;
+    let y = Math.floor(Math.random() * (GRID_SIZE - 2)) + 1;
     
     // Make sure food doesn't appear on snake
-    const isOnSnake = snake.some(segment => segment.x === x && segment.y === y);
-    if (isOnSnake) return generateFood();
+    // Using a while loop instead of recursion to avoid stack overflow
+    let attempts = 0;
+    while (
+      snakeCopy.some(segment => segment.x === x && segment.y === y) && 
+      attempts < 50
+    ) {
+      x = Math.floor(Math.random() * (GRID_SIZE - 2)) + 1;
+      y = Math.floor(Math.random() * (GRID_SIZE - 2)) + 1;
+      attempts++;
+    }
     
+    console.log("Food generated at", x, y);
     return { x, y };
   }, [snake]);
 
@@ -260,28 +273,39 @@ export function SnakeGame({ onExit }: SnakeGameProps) {
       </div>
       
       {/* Game Board */}
-      <div className="aspect-[4/3] bg-black relative overflow-hidden p-4">
-        <div className="w-full h-full relative border-2 border-gray-800">
-          {/* Snake */}
-          {snake.map((segment, index) => (
+      <div className="w-full h-full aspect-video max-w-4xl mx-auto bg-black relative overflow-hidden p-4">
+        <div className="w-full h-full relative border-2 border-gray-800 flex items-center justify-center">
+          <div className="relative" style={{ 
+            width: `${GRID_SIZE * CELL_SIZE}px`, 
+            height: `${GRID_SIZE * CELL_SIZE}px`,
+            maxWidth: '100%',
+            maxHeight: '100%'
+          }}>
+            {/* Snake */}
+            {snake.map((segment, index) => (
+              <div 
+                key={index}
+                className="snake-pixel absolute"
+                style={{
+                  left: `${segment.x * CELL_SIZE}px`,
+                  top: `${segment.y * CELL_SIZE}px`,
+                  width: `${CELL_SIZE}px`,
+                  height: `${CELL_SIZE}px`,
+                }}
+              />
+            ))}
+            
+            {/* Food */}
             <div 
-              key={index}
-              className="snake-pixel"
+              className="food-pixel absolute"
               style={{
-                left: `${segment.x * CELL_SIZE}px`,
-                top: `${segment.y * CELL_SIZE}px`,
+                left: `${food.x * CELL_SIZE}px`,
+                top: `${food.y * CELL_SIZE}px`,
+                width: `${CELL_SIZE}px`,
+                height: `${CELL_SIZE}px`,
               }}
             />
-          ))}
-          
-          {/* Food */}
-          <div 
-            className="food-pixel"
-            style={{
-              left: `${food.x * CELL_SIZE}px`,
-              top: `${food.y * CELL_SIZE}px`,
-            }}
-          />
+          </div>
         </div>
         
         {/* Game Over Overlay */}

@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
 :root {
   --background: 0 0% 0%;
@@ -149,19 +149,21 @@
 
   .snake-pixel {
     position: absolute;
-    width: 15px;
-    height: 15px;
+    width: 20px;
+    height: 20px;
     background-color: hsl(var(--primary));
     border: 1px solid #121212;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
   }
 
   .food-pixel {
     position: absolute;
-    width: 15px;
-    height: 15px;
+    width: 20px;
+    height: 20px;
     background-color: hsl(var(--accent));
     border: 1px solid #121212;
     border-radius: 50%;
+    box-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
   }
 
   .cabinet-light {
