@@ -122,10 +122,10 @@ export function PongGame({ onExit }: PongGameProps) {
   const update = useCallback((deltaTime: number) => {
     // Move player paddle based on key presses
     if (keysRef.current.ArrowUp && playerY > 0) {
-      setPlayerY(prev => Math.max(0, prev - PADDLE_SPEED));
+      setPlayerY(prev => Math.max(0, prev - PADDLE_SPEED * (deltaTime / 16)));
     }
     if (keysRef.current.ArrowDown && playerY < CANVAS_HEIGHT - PADDLE_HEIGHT) {
-      setPlayerY(prev => Math.min(CANVAS_HEIGHT - PADDLE_HEIGHT, prev + PADDLE_SPEED));
+      setPlayerY(prev => Math.min(CANVAS_HEIGHT - PADDLE_HEIGHT, prev + PADDLE_SPEED * (deltaTime / 16)));
     }
     
     // AI movement (follows the ball with some delay)

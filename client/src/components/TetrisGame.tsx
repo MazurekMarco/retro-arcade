@@ -79,6 +79,11 @@ const createEmptyGrid = () => {
   );
 };
 
+// Add these type definitions at the top of the file
+type Cell = string | null;
+type Grid = Cell[][];
+type KeyboardEvent = React.KeyboardEvent<HTMLDivElement>;
+
 interface TetrisGameProps {
   onExit: () => void;
 }
@@ -109,6 +114,8 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
   const [speed, setSpeed] = useState(INITIAL_SPEED);
   const [gameStarted, setGameStarted] = useState(false);
   const [nextTetromino, setNextTetromino] = useState<Tetromino | null>(null);
+  const [nextTetrominoDisplay, setNextTetrominoDisplay] = useState<Cell[][]>(createEmptyGrid(4, 4));
+  const [ghostPosition, setGhostPosition] = useState<Cell[][]>(createEmptyGrid(GRID_HEIGHT, GRID_WIDTH));
   
   // Refs for game loop
   const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
@@ -342,39 +349,10 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
   }, [level, playSound]);
   
   // Handle keydown events
-  const handleKeyDown = useCallback((e) => {
-    if (gameOverRef.current) {
-      if (e.code === "Space") {
-        restartGame();
-      }
-      return;
-    }
-    
-    if (!gameStarted) {
-      if (e.code === "Space" || e.code === "Enter") {
-        setGameStarted(true);
-        playSound('select');
-      }
-      return;
-    }
-    
-    if (e.code === "Space") {
-      if (e.ctrlKey || e.shiftKey) {
-        // Hard drop
-        if (!pausedRef.current) {
-          hardDrop();
-        }
-      } else {
-        // Pause/Resume
-        setPaused(prev => !prev);
-        playSound('select');
-      }
-      return;
-    }
-    
-    if (pausedRef.current) return;
-    
-    switch (e.code) {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (gameOver || !gameStarted) return;
+
+    switch (e.key) {
       case "ArrowLeft":
         moveTetromino(-1, 0);
         break;
@@ -383,20 +361,20 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
         break;
       case "ArrowDown":
         moveDown();
-        setScore(prev => prev + 1); // Small bonus for soft drop
         break;
       case "ArrowUp":
-      case "KeyZ":
         rotateTetromino();
         break;
-      case "KeyC":
-        // Hard drop
-        hardDrop();
-        break;
-      default:
+      case " ":
+        if (!gameStarted) {
+          setGameStarted(true);
+          playSound('select');
+        } else {
+          setPaused(prev => !prev);
+        }
         break;
     }
-  }, [moveDown, moveTetromino, rotateTetromino, hardDrop, playSound, gameStarted]);
+  };
   
   // Set up keyboard event listeners
   useEffect(() => {
@@ -454,39 +432,21 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
   
   // Render the game board with the active tetromino
   const renderBoard = () => {
-    // Create a copy of the grid
-    const displayGrid = grid.map(row => [...row]);
-    
-    // Add the active tetromino to the display grid
-    if (activeTetromino) {
-      for (let y = 0; y < activeTetromino.shape.length; y++) {
-        for (let x = 0; x < activeTetromino.shape[y].length; x++) {
-          if (activeTetromino.shape[y][x]) {
-            const newY = position.y + y;
-            const newX = position.x + x;
-            
-            // Only display blocks within the grid
-            if (newY >= 0 && newY < GRID_HEIGHT && newX >= 0 && newX < GRID_WIDTH) {
-              displayGrid[newY][newX] = activeTetromino.color;
-            }
-          }
-        }
-      }
-    }
-    
-    // Render the grid
     return (
-      <div className="w-full h-full border-2 border-gray-800 bg-black overflow-hidden">
-        {displayGrid.map((row, y) => (
-          <div key={y} className="flex">
-            {row.map((cell, x) => (
-              <div 
-                key={`${y}-${x}`} 
-                className={`border border-gray-900 flex-shrink-0 ${cell ? `bg-${cell}` : 'bg-black'}`}
-                style={{ width: CELL_SIZE, height: CELL_SIZE }}
-              />
-            ))}
-          </div>
+      <div className="grid" style={{ display: 'grid', gridTemplateColumns: `repeat(${GRID_WIDTH}, ${CELL_SIZE}px)` }}>
+        {grid.map((row: Cell[], rowIndex: number) => (
+          row.map((cell: Cell, colIndex: number) => (
+            <div
+              key={`${rowIndex}-${colIndex}`}
+              className={`cell ${cell || ''}`}
+              style={{
+                width: CELL_SIZE,
+                height: CELL_SIZE,
+                backgroundColor: cell || 'transparent',
+                border: '1px solid rgba(255, 255, 255, 0.1)'
+              }}
+            />
+          ))
         ))}
       </div>
     );
@@ -620,8 +580,7 @@ export function TetrisGame({ onExit }: TetrisGameProps) {
               <p className="mb-1">← → : MOVE</p>
               <p className="mb-1">↑ or Z : ROTATE</p>
               <p className="mb-1">↓ : SOFT DROP</p>
-              <p className="mb-1">C or SHIFT+SPACE : HARD DROP</p>
-              <p>SPACE : PAUSE</p>
+              <p className="mb-1">SPACE : PAUSE</p>
             </div>
           </div>
           

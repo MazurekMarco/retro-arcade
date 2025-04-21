@@ -10,7 +10,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const { isMuted, toggleMute, playSound } = useSound();
-  const { showHighScores, toggleHighScores } = useHighScores();
+  const { toggleHighScores } = useHighScores();
 
   const handleHighScoreClick = () => {
     playSound('select');

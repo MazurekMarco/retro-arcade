@@ -21,7 +21,6 @@ interface GameMenuProps {
 export function GameMenu({ onSelectGame }: GameMenuProps) {
   const { getHighScore } = useHighScores();
   const { playSound } = useSound();
-  const [isHighScoresVisible, setIsHighScoresVisible] = useState(false);
 
   // Available games that can be played
   const availableGames: Game[] = [
